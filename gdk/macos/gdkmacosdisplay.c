@@ -324,6 +324,19 @@ gdk_macos_display_queue_events (GdkDisplay *display)
                                     _gdk_event_queue_append (GDK_DISPLAY (self), event),
                                     event,
                                     _gdk_display_get_next_serial (GDK_DISPLAY (self)));
+          // REVIEW NOTE:
+          // This is necessary for a cursor update, window move & resize, and window
+          // controls (max/min/close buttons). Ideally we would forward events back
+          // to native window if they were not handled or prevented by GTK.
+          switch ((int)[nsevent type])
+            {
+              case NSEventTypeLeftMouseDown:
+              case NSEventTypeMouseMoved:
+              [NSApp sendEvent:nsevent];
+                break;
+              default:
+                break;
+            }
         }
       else
         {
