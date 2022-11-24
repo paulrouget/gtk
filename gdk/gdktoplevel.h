@@ -215,6 +215,8 @@ GDK_AVAILABLE_IN_4_4
 gboolean      gdk_toplevel_titlebar_gesture          (GdkToplevel        *toplevel,
                                                       GdkTitlebarGesture  gesture);
 
+void          gdk_toplevel_draw_window_control       (GdkToplevel *toplevel, gboolean start, float x, float y);
+void          gdk_toplevel_get_window_control_size   (GdkToplevel *toplevel, float *width, float *height);
 G_END_DECLS
 
 #endif /* __GDK_TOPLEVEL_H__ */

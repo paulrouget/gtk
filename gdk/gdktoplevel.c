@@ -88,6 +88,18 @@ gdk_toplevel_default_titlebar_gesture (GdkToplevel        *toplevel,
   return FALSE;
 }
 
+static void
+gdk_toplevel_default_draw_window_control(GdkToplevel *toplevel, gboolean start, float x, float y)
+{
+}
+
+static void
+gdk_toplevel_default_get_window_control_size(GdkToplevel *toplevel, float *width, float *height)
+{
+  *width = 0;
+  *height = 0;
+}
+
 static gboolean
 gdk_toplevel_default_supports_edge_constraints (GdkToplevel *toplevel)
 {
@@ -125,6 +137,8 @@ gdk_toplevel_default_init (GdkToplevelInterface *iface)
   iface->inhibit_system_shortcuts = gdk_toplevel_default_inhibit_system_shortcuts;
   iface->restore_system_shortcuts = gdk_toplevel_default_restore_system_shortcuts;
   iface->titlebar_gesture = gdk_toplevel_default_titlebar_gesture;
+  iface->draw_window_control = gdk_toplevel_default_draw_window_control;
+  iface->get_window_control_size = gdk_toplevel_default_get_window_control_size;
 
   /**
    * GdkToplevel:state: (attributes org.gtk.Property.get=gdk_toplevel_get_state)
@@ -723,4 +737,33 @@ gdk_toplevel_titlebar_gesture (GdkToplevel        *toplevel,
 
   return GDK_TOPLEVEL_GET_IFACE (toplevel)->titlebar_gesture (toplevel,
                                                               gesture);
+}
+
+/**
+ * gdk_toplevel_draw_window_control
+ * @toplevel: a `GdkToplevel`
+ * @start: draw controls on the left of the window if true
+ * @x: surface X coordinate of controls
+ * @y: surface Y coordinate of controls
+ */
+void
+gdk_toplevel_draw_window_control(GdkToplevel *toplevel, gboolean start, float x, float y)
+{
+  g_return_if_fail (GDK_IS_TOPLEVEL (toplevel));
+
+  GDK_TOPLEVEL_GET_IFACE (toplevel)->draw_window_control(toplevel, start, x, y);
+}
+
+/**
+ * gdk_toplevel_get_window_control_size
+ * @toplevel: a `GdkToplevel`
+ * @width: width of the window controls
+ * @height: height of the window controls
+ */
+void
+gdk_toplevel_get_window_control_size(GdkToplevel *toplevel, float* width, float* height)
+{
+  g_return_if_fail (GDK_IS_TOPLEVEL (toplevel));
+
+  GDK_TOPLEVEL_GET_IFACE (toplevel)->get_window_control_size(toplevel, width, height);
 }

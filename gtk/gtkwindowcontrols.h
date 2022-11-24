@@ -51,4 +51,7 @@ void         gtk_window_controls_set_decoration_layout (GtkWindowControls *self,
 GDK_AVAILABLE_IN_ALL
 gboolean     gtk_window_controls_get_empty             (GtkWindowControls *self);
 
+  GDK_AVAILABLE_IN_4_4
+void gtk_window_controls_update(GtkWindowControls *self);
+
 G_END_DECLS

@@ -24,6 +24,7 @@
 #include "gtkactionable.h"
 #include "gtkboxlayout.h"
 #include "gtkbutton.h"
+#include "gtkdrawingarea.h"
 #include "gtkenums.h"
 #include "gtkicontheme.h"
 #include "gtkimage.h"
@@ -225,6 +226,24 @@ clear_controls (GtkWindowControls *self)
 }
 
 static void
+draw_native_button(GtkDrawingArea *da, cairo_t *cr, int width, int height, gpointer data) {
+  double x, y;
+  GtkWindowControls *ctrls = data;
+  GtkWidget *widget = GTK_WIDGET (da);
+  GtkRoot *root = gtk_widget_get_root (widget);
+
+  if (!root || !GTK_IS_WINDOW (root)) {
+    return;
+  }
+
+  GtkWindow *window = GTK_WINDOW (root);
+
+  gtk_widget_translate_coordinates (widget, GTK_WIDGET (root), 0, 0, &x, &y);
+
+  gtk_window_draw_window_control(window, ctrls->side == GTK_PACK_START, x, y);
+}
+
+static void
 update_window_buttons (GtkWindowControls *self)
 {
   GtkWidget *widget = GTK_WIDGET (self);
@@ -358,6 +377,15 @@ update_window_buttons (GtkWindowControls *self)
                                           GTK_ACCESSIBLE_PROPERTY_DESCRIPTION,
                                             _("Close the window"),
                                           -1);
+        } else if (strcmp (tokens[i], "native") == 0 && is_sovereign_window) {
+          float w, h;
+          gtk_window_get_window_control_size(window, &w, &h);
+          if (w != 0 && h != 0) {
+            button = gtk_drawing_area_new ();
+            gtk_widget_set_valign (button, GTK_ALIGN_CENTER);
+            gtk_widget_set_size_request (button, w, h);
+            gtk_drawing_area_set_draw_func (GTK_DRAWING_AREA (button), draw_native_button, self, NULL);
+          }
         }
 
       if (button)
@@ -651,6 +679,17 @@ gtk_window_controls_get_decoration_layout (GtkWindowControls *self)
   g_return_val_if_fail (GTK_IS_WINDOW_CONTROLS (self), NULL);
 
   return self->decoration_layout;
+}
+
+/**
+ * FIXME
+ */
+void
+gtk_window_controls_update(GtkWindowControls *self)
+{
+  g_return_if_fail (GTK_IS_WINDOW_CONTROLS (self));
+
+  update_window_buttons (self);
 }
 
 /**

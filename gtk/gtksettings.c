@@ -925,9 +925,15 @@ gtk_settings_class_init (GtkSettingsClass *class)
    * Also note that the setting can be overridden with the
    * [property@Gtk.HeaderBar:decoration-layout] property.
    */
+#ifdef GDK_WINDOWING_MACOS
+  const char* default_layout = "native:menu";
+#else
+  const char* default_layout = "menu:minimize,maximize,close";
+#endif
+
   result = settings_install_property_parser (class,
                                              g_param_spec_string ("gtk-decoration-layout", NULL, NULL,
-                                                                  "menu:minimize,maximize,close", GTK_PARAM_READWRITE));
+                                                                  default_layout, GTK_PARAM_READWRITE));
   g_assert (result == PROP_DECORATION_LAYOUT);
 
   /**

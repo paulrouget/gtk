@@ -47,6 +47,7 @@
 #include <glib/gi18n-lib.h>
 #include "gtkmain.h"
 #include "gtkmarshalers.h"
+#include "gtkwindowcontrols.h"
 #include "deprecated/gtkmessagedialog.h"
 #include "gtkpointerfocusprivate.h"
 #include "gtkprivate.h"
@@ -4380,6 +4381,14 @@ gtk_window_realize (GtkWidget *widget)
   if (priv->application)
     gtk_application_handle_window_realize (priv->application, window);
 
+  // REVIEW NOTE:
+  // At this point, the surface is available, the size of the native window
+  // controls can be computed, we need to notify the window controls that
+  // it needs to update the window buttons. I use this signal as it triggers
+  // a call to update_window_buttons, but there's probably a better way of
+  // doing this, maybe introducing a "realized" signal?
+  g_object_notify_by_pspec (G_OBJECT (window), window_props[PROP_ICON_NAME]);
+
   /* Icons */
   gtk_window_realize_icon (window);
 
@@ -6932,4 +6941,35 @@ gtk_window_get_handle_menubar_accel (GtkWindow *window)
   phase = gtk_event_controller_get_propagation_phase (priv->menubar_controller);
 
   return phase == GTK_PHASE_CAPTURE;
+}
+
+/**
+ * FIXME:documentation
+ */
+void
+gtk_window_draw_window_control(GtkWindow *window, gboolean start, float x, float y)
+{
+  GtkWindowPrivate *priv = gtk_window_get_instance_private (window);
+
+  g_return_if_fail (GTK_IS_WINDOW (window));
+
+  gdk_toplevel_draw_window_control(GDK_TOPLEVEL (priv->surface), start, x, y);
+}
+
+/**
+ * FIXME:documentation
+ */
+void
+gtk_window_get_window_control_size(GtkWindow *window, float *width, float *height)
+{
+  GtkWindowPrivate *priv = gtk_window_get_instance_private (window);
+
+  g_return_if_fail (GTK_IS_WINDOW (window));
+
+  if (priv->surface) {
+    // Native window is not up yet.
+    gdk_toplevel_get_window_control_size(GDK_TOPLEVEL (priv->surface), width, height);
+  } else {
+    *width = *height = 0;
+  }
 }

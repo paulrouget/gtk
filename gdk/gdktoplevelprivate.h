@@ -40,6 +40,8 @@ struct _GdkToplevelInterface
                                          guint32            timestamp);
   gboolean      (* titlebar_gesture)    (GdkToplevel       *toplevel,
                                          GdkTitlebarGesture gesture);
+  void          (* draw_window_control) (GdkToplevel *toplevel, gboolean start, float x, float y);
+  void          (* get_window_control_size) (GdkToplevel *toplevel, float *width, float *height);
 };
 
 typedef enum
