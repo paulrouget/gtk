@@ -149,7 +149,7 @@ typedef NSString *CALayerContentsGravity;
       _gdk_macos_display_break_all_grabs (GDK_MACOS_DISPLAY (display), time);
 
       /* Reset gravity */
-      [[[self contentView] layer] setContentsGravity:kCAGravityBottomLeft];
+      [[[self gtkView] layer] setContentsGravity:kCAGravityBottomLeft];
 
       break;
     }
@@ -188,7 +188,7 @@ typedef NSString *CALayerContentsGravity;
 
       if (NSPointInRect ([NSEvent mouseLocation], [self frame]))
         {
-          GdkMacosBaseView *view = (GdkMacosBaseView *)[self contentView];
+          GdkMacosBaseView *view = (GdkMacosBaseView *)[self gtkView];
           NSEvent *event;
 
           event = [NSEvent enterExitEventWithType: NSEventTypeMouseEntered
@@ -219,7 +219,7 @@ typedef NSString *CALayerContentsGravity;
     }
 
   [super setFrame:frame display:display];
-  [[self contentView] setFrame:NSMakeRect (0, 0, contentRect.size.width, contentRect.size.height)];
+  [[self gtkView] setFrame:NSMakeRect (0, 0, contentRect.size.width, contentRect.size.height)];
 }
 
 -(id)initWithContentRect:(NSRect)contentRect
@@ -242,7 +242,18 @@ typedef NSString *CALayerContentsGravity;
   [self setPreservesContentDuringLiveResize:NO];
 
   view = [[GdkMacosView alloc] initWithFrame:contentRect];
-  [self setContentView:view];
+
+  NSVisualEffectView * ve = [NSVisualEffectView alloc];
+  [ve initWithFrame:contentRect];
+  [ve setBlendingMode:NSVisualEffectBlendingModeBehindWindow];
+  [ve setMaterial:NSVisualEffectMaterialSidebar];
+  [ve setWantsLayer:YES];
+  [ve setAutoresizesSubviews:YES];
+  [self setContentView:ve];
+  [ve addSubview:view];
+  [[self contentView]setAutoresizingMask:NSViewHeightSizable|NSViewWidthSizable];
+
+  [ve release];
   [view release];
 
   /* TODO: We might want to make this more extensible at some point */
@@ -569,7 +580,7 @@ typedef NSString *CALayerContentsGravity;
       break;
     }
 
-  [[[self contentView] layer] setContentsGravity:gravity];
+  [[[self gtkView] layer] setContentsGravity:gravity];
 
   initialResizeFrame = [self frame];
   initialResizeLocation = convert_nspoint_to_screen (self, [self mouseLocationOutsideOfEventStream]);
@@ -834,6 +845,11 @@ typedef NSString *CALayerContentsGravity;
   return self->gdk_surface;
 }
 
+-(NSView *)gtkView
+{
+  return [[self contentView] subviews][0];
+}
+
 -(GdkMacosDisplay *)gdkDisplay
 {
   return GDK_MACOS_DISPLAY (GDK_SURFACE (self->gdk_surface)->display);
@@ -846,7 +862,7 @@ typedef NSString *CALayerContentsGravity;
 
 -(void)swapBuffer:(GdkMacosBuffer *)buffer withDamage:(const cairo_region_t *)damage
 {
-  [(GdkMacosView *)[self contentView] swapBuffer:buffer withDamage:damage];
+  [(GdkMacosView *)[self gtkView] swapBuffer:buffer withDamage:damage];
 }
 
 -(BOOL)needsMouseDownQuirk

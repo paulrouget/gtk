@@ -42,6 +42,11 @@
   return self;
 }
 
+-(BOOL)allowsVibrancy
+{
+  return NO;
+}
+
 -(BOOL)isFlipped
 {
   return YES;

@@ -2648,8 +2648,10 @@ gdk_surface_set_opaque_region (GdkSurface      *surface,
   g_return_if_fail (GDK_IS_SURFACE (surface));
   g_return_if_fail (!GDK_SURFACE_DESTROYED (surface));
 
+#if 0
   if (cairo_region_equal (surface->opaque_region, region))
     return;
+#endif
 
   g_clear_pointer (&surface->opaque_region, cairo_region_destroy);
 

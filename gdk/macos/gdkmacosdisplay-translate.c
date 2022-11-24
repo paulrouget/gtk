@@ -66,7 +66,7 @@ test_resize (NSEvent         *event,
        * the resize indicator is the only way of resizing windows on Mac
        * OS, it is too important to not make functional.
        */
-      frame = [[window contentView] bounds];
+      frame = [[window gtkView] bounds];
       if (x > frame.size.width - GRIP_WIDTH &&
           x < frame.size.width &&
           y > frame.size.height - GRIP_HEIGHT &&
@@ -816,7 +816,7 @@ get_surface_from_ns_event (GdkMacosDisplay *self,
       NSPoint point, view_point;
       NSRect view_frame;
 
-      view = (GdkMacosBaseView *)[nswindow contentView];
+      view = (GdkMacosBaseView *)[nswindow gtkView];
       if (!GDK_IS_MACOS_BASE_VIEW (view))
         goto find_under_pointer;
 
@@ -898,7 +898,7 @@ find_under_pointer:
 static GdkMacosSurface *
 find_surface_for_keyboard_event (NSEvent *nsevent)
 {
-  NSView *nsview = [[nsevent window] contentView];
+  NSView *nsview = [[nsevent window] gtkView];
 
   if (GDK_IS_MACOS_BASE_VIEW (nsview))
     {
@@ -1065,7 +1065,7 @@ find_surface_for_ns_event (GdkMacosDisplay *self,
        * titlebar buttons.
        */
       if ((surface = get_surface_from_ns_event (self, nsevent, &point, x, y)) &&
-          (view = (GdkMacosBaseView *)[GDK_MACOS_SURFACE (surface)->window contentView]) &&
+          (view = (GdkMacosBaseView *)[GDK_MACOS_SURFACE (surface)->window gtkView]) &&
           ([nsevent trackingArea] == [view trackingArea]))
         return GDK_MACOS_SURFACE (surface);
       else

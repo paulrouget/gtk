@@ -174,7 +174,7 @@ gdk_macos_surface_set_input_region (GdkSurface     *surface,
 
   cairo_region_get_extents (region, &rect);
 
-  [(GdkMacosBaseView *)[self->window contentView] setInputArea:&rect];
+  [(GdkMacosBaseView *)[self->window gtkView] setInputArea:&rect];
 }
 
 static void
@@ -1066,7 +1066,7 @@ _gdk_macos_surface_is_tracking (GdkMacosSurface *self,
   if (self->window == NULL)
     return FALSE;
 
-  view = (GdkMacosBaseView *)[self->window contentView];
+  view = (GdkMacosBaseView *)[self->window gtkView];
   if (view == NULL)
     return FALSE;
 
@@ -1210,7 +1210,7 @@ _gdk_macos_surface_get_view (GdkMacosSurface *self)
   if (self->window == NULL)
     return NULL;
 
-  return [self->window contentView];
+  return [self->window gtkView];
 }
 
 void
